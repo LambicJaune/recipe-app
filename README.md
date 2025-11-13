@@ -53,11 +53,10 @@ Open your browser and go to http://localhost:8000
 
 
 ## 🧪 Running Tests
-
 To run automated tests for the app:
-```bash
-python manage.py test
+      ```bash
+      python manage.py test
 
-👩‍💻 Author
+## 👩‍💻 Author
 
 Developed by LambicJaune as part of a Django learning project.
