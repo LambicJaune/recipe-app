@@ -52,7 +52,7 @@ It allows users to view, add, and manage recipes while demonstrating Django’s 
 Open your browser and go to http://localhost:8000
 
 
-🧪 Running Tests
+## 🧪 Running Tests
 
 To run automated tests for the app:
 ```bash
