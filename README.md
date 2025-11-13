@@ -51,11 +51,15 @@ It allows users to view, add, and manage recipes while demonstrating Django’s 
 6. **Access the app:**
 Open your browser and go to http://localhost:8000
 
+---
 
 ## 🧪 Running Tests
 To run automated tests for the app:
-      ```bash
-      python manage.py test
+   ```bash
+   python manage.py test
+   ```
+
+---
 
 ## 👩‍💻 Author
 
