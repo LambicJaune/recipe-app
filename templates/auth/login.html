@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {% load static %}
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'recipes/styles.css' %}">
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <header class="header">
+        <div class="header-left">Recipe App</div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content login-page">
+
+        <h2>Welcome to Recipe App</h2>
+        <p>
+            Discover, share, and explore delicious recipes.<br>
+            Search by ingredient, mood, or skill level — cooking made simple.
+        </p>
+
+        <hr class="divider">
+
+        <h1>Login</h1>
+        <p>Enter your credentials to access your account.</p>
+
+        {% if error_message %}
+            <p class="error-message">{{ error_message }}</p>
+        {% endif %}
+
+        <div class="form-container">
+            <form action="" method="POST">
+                {% csrf_token %}
+                {{ form }}
+
+                <button type="submit" class="submit-btn">Login</button>
+            </form>
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <p>Created for my Django project — All rights reserved.</p>
+    </footer>
+
+</body>
+</html>

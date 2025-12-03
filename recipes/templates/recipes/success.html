@@ -5,7 +5,7 @@
     {% load static %}
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Recipe App - Home</title>
+    <title>Recipe App - Logout Success</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'recipes/styles.css' %}">
@@ -14,15 +14,10 @@
 <body>
     <header class="header">
         <div class="header-left">Recipe App</div>
-        <div class="header-right">Home</div>
     </header>
 
-    <main class="main-content home-page">
-        <h1>WELCOME TO THE RECIPE APP</h1>
-        <p>Your place to browse, share, and discover amazing recipes.</p><br>
-        <a href="{% url 'login' %}" class="btn"">
-            <button>Login to explore and share recipes</button>
-        </a>
+    <main class="main-content overview-page">
+        <h1>YOU'VE SUCCESSFULLY LOGGED OUT!</h1>
     </main>
 
     <footer class="footer">
