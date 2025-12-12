@@ -14,29 +14,25 @@
 <body>
     <header class="header">
         <div class="header-left">Recipe App</div>
-        <a href="{%url 'logout' %}"" class=" logout-btn"">
-            <button>Logout</button>
-        </a>
+        <a href="{% url 'logout' %}" class="logout-btn">Logout</a>
     </header>
 
     <main class="main-content detail-page">
         <div class="recipe-detail-card">
-            <img src="{{ object.pic.url }}" alt="{{ object.name }}" class="recipe-image" />
-
+            <img src="{{ object.pic.url|default:'/media/no_picture.jpg' }}" alt="{{ object.name }}" class="recipe-image">
             <h1>{{ object.name }}</h1>
+
             <p>{{ object.description }}</p>
 
             <h3>Ingredients:</h3>
             <p>{{ object.ingredients|linebreaks }}</p>
 
             <div class="recipe-header">
-                <span class="recipe-titles"><strong>Cooking Time:</strong> {{ object.cooking_time }} min</span>
-                <span class="recipe-titles"><strong>Difficulty Level:</strong> {{ object.calculate_difficulty }}</span>
+                <span><strong>Cooking Time:</strong> {{ object.cooking_time }} min</span>
+                <span><strong>Difficulty Level:</strong> {{ object.calculate_difficulty }}</span>
             </div>
 
-            <a href="{% url 'recipes:recipes_overview' %}">
-                <button class="button-return-overview">Back to Recipes</button>
-            </a>
+            <a href="{% url 'recipes:recipes_overview' %}" class="button-return-overview">Back to Recipes</a>
         </div>
     </main>
 

@@ -9,9 +9,10 @@ class Recipe(models.Model):
     difficulty = models.CharField(max_length=20, editable=False, blank=True)
     pic = models.ImageField(upload_to='recipes', default='no_picture.jpg')
 
+    @property
     def calculate_difficulty(self):
-        """Pure function that only returns a value."""
-        ingredients_list = self.ingredients.splitlines()
+        """Compute difficulty dynamically."""
+        ingredients_list = [i.strip() for i in self.ingredients.splitlines() if i.strip()]
 
         if self.cooking_time < 10 and len(ingredients_list) < 4:
             return "Easy"
@@ -21,11 +22,6 @@ class Recipe(models.Model):
             return "Intermediate"
         else:
             return "Hard"
-
-    def save(self, *args, **kwargs):
-        # Store the calculated difficulty before saving
-        self.difficulty = self.calculate_difficulty()
-        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name

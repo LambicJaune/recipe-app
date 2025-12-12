@@ -12,33 +12,161 @@
 </head>
 
 <body>
+
     <header class="header">
         <div class="header-left">Recipe App</div>
-        <a href="{%url 'logout' %}"" class=" logout-btn"">
-            <button>Logout</button>
-        </a>
+        <a href="{% url 'logout' %}" class="logout-btn">Logout</a>
     </header>
 
     <main class="main-content overview-page">
+
         <h1>THE RECIPES</h1>
-        <p>Browse through our collection of delicious recipes.</p><br>
+        <p>Browse through our collection of delicious recipes.</p>
+
+        <!-- SEARCH FORM -->
+        <div class="form-container">
+            <form method="get" class="search-form">
+
+                <div class="form-row">
+                    <!-- Recipe Name -->
+                    <div class="form-group half-width">
+                        <label for="id_recipe_name">Recipe Name</label>
+                        {{ search_form.recipe_name }}
+                    </div>
+
+                    <!-- Difficulty -->
+                    <div class="form-group half-width">
+                        <label for="id_difficulty_level">Difficulty Level</label>
+                        {{ search_form.difficulty_level }}
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <!-- INGREDIENT DROPDOWN -->
+                    <div class="form-group half-width">
+                        <label>Select Ingredients</label>
+                        <div class="dropdown-wrapper">
+                            <div class="dropdown-btn" onclick="toggleDropdown()">
+                                <span id="dropdown-placeholder">All ingredients</span>
+                            </div>
+                            <div id="dropdown-menu" class="dropdown-content">
+                                {% for checkbox in search_form.ingredient %}
+                                <label class="dropdown-item">
+                                    {{ checkbox.tag }}
+                                    {{ checkbox.choice_label }}
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Max cooking time -->
+                    <div class="form-group half-width">
+                        <label for="id_max_cooking_time">Max Cooking Time (min)</label>
+                        {{ search_form.max_cooking_time }}
+                    </div>
+                </div>
+
+                <!-- Buttons -->
+                <div class="form-row button-row">
+                    <button type="submit" class="submit-btn">Search</button>
+                    <a href="{% url 'recipes:recipe_charts' %}" class="submit-btn">View Charts</a>
+                </div>
+
+            </form>
+        </div>
+
+
+        <!-- DISPLAY FORM NON-FIELD ERRORS (e.g., Hard recipe warning) -->
+        {% if search_form.non_field_errors %}
+        <div class="no-recipes" style="color:#ffcc00; text-align:center;">
+            {% for error in search_form.non_field_errors %}
+            {{ error }}
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- RECIPE GRID -->
+        {% if recipes %}
         <div class="recipe-grid">
-            {% for object in object_list %}
+            {% for object in recipes %}
             <div class="recipe-item">
                 <a href="{{ object.get_absolute_url }}">
                     <div class="recipe-image-container">
-                        <img src="{{ object.pic.url }}" alt="{{ object.name }}" />
+                        <img src="{% if object.pic %}{{ object.pic.url }}{% else %}{% static 'recipes/No-Pic.png' %}{% endif %}"
+                            alt="{{ object.name }}" class="recipe-image">
+
                     </div>
                     <div class="recipe-title-overlay">{{ object.name }}</div>
                 </a>
             </div>
             {% endfor %}
         </div>
+        {% else %}
+        <p class="no-recipes">No recipes found matching your filters.</p>
+        {% endif %}
+
+        {% if df_html %}
+        <div class="table-container">
+            {{ df_html|safe }}
+        </div>
+        {% endif %}
+
+        <!-- PAGINATION -->
+        {% if recipes.paginator.num_pages > 1 %}
+        <div class="pagination" style="text-align:center; margin-top:20px;">
+            {% if recipes.has_previous %}
+            <a href="?page={{ recipes.previous_page_number }}">Previous</a>
+            {% endif %}
+
+            {% for num in recipes.paginator.page_range %}
+            {% if num == recipes.number %}
+            <strong>{{ num }}</strong>
+            {% else %}
+            <a href="?page={{ num }}">{{ num }}</a>
+            {% endif %}
+            {% endfor %}
+
+            {% if recipes.has_next %}
+            <a href="?page={{ recipes.next_page_number }}">Next</a>
+            {% endif %}
+        </div>
+        {% endif %}
+
     </main>
 
     <footer class="footer">
         <p>Created for my Django project — All rights reserved.</p>
     </footer>
+
+    <script>
+        function toggleDropdown() {
+            const menu = document.getElementById("dropdown-menu");
+            menu.style.display = (menu.style.display === "block") ? "none" : "block";
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener("click", function (event) {
+            const dropdown = document.querySelector(".dropdown-wrapper");
+            if (!dropdown.contains(event.target)) {
+                document.getElementById("dropdown-menu").style.display = "none";
+            }
+        });
+
+        // Update placeholder when selections change
+        document.addEventListener("change", function () {
+            const checkboxes = document.querySelectorAll(".dropdown-content input[type='checkbox']");
+            const selected = [];
+
+            checkboxes.forEach(cb => {
+                if (cb.checked) selected.push(cb.value);
+            });
+
+            const placeholder = document.getElementById("dropdown-placeholder");
+            placeholder.textContent = selected.length ? selected.join(", ") : "All ingredients";
+        });
+    </script>
+
 </body>
 
 </html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <title>Recipe Charts</title>
+    <link rel="stylesheet" href="{% static 'recipes/styles.css' %}">
+</head>
+
+<body>
+
+<header class="header">
+    <div class="header-left">Recipe App</div>
+    <div class="header-right">
+        <a href="{% url 'recipes:recipes_overview' %}" class="header-btn">Back to Recipes</a>
+        <a href="{% url 'logout' %}" class="logout-btn header-btn">Logout</a>
+    </div>
+</header>
+
+<main class="main-content">
+
+    <h1>Recipe Charts</h1>
+    <p>Global statistics of all recipes.</p>
+
+    {% if charts %}
+    <div>
+
+        <h3>Data Visualizations</h3>
+
+        <!-- BAR CHART -->
+        <div class="chart-block">
+            <img src="data:image/png;base64,{{ charts.bar }}" class="chart-img">
+        </div><br>
+
+        <!-- PIE CHART -->
+        <div class="chart-block">
+            <img src="data:image/png;base64,{{ charts.pie }}" class="chart-img">
+        </div><br>
+
+        <!-- LINE CHART -->
+        <div class="chart-block">
+            <img src="data:image/png;base64,{{ charts.line }}" class="chart-img">
+        </div>
+
+    </div>
+    {% endif %}
+
+</main>
+
+<footer class="footer">
+    <p>Created for my Django project — All rights reserved.</p>
+</footer>
+
+</body>
+</html>
