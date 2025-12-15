@@ -220,3 +220,6 @@ __marimo__/
 
 # Database
 *.sqlite3
+
+#.env
+.env

@@ -11,6 +11,10 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,12 +24,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-%5)gj-wifxe9_rhnyq-orim44up1n(-amf=sr#vigpdbp!#$vi'
+SECRET_KEY = os.getenv("SECRET_KEY", "fallback-secret-key")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DEBUG", "True") == "True"
 
-ALLOWED_HOSTS = []
+# Allowed hosts
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")  # converts CSV to list
 
 
 # Application definition
@@ -76,8 +81,8 @@ WSGI_APPLICATION = 'recipe_project.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': os.getenv("DB_ENGINE", "django.db.backends.sqlite3"),
+        'NAME': BASE_DIR / os.getenv("DB_NAME", "db.sqlite3"),
     }
 }
 
@@ -118,10 +123,10 @@ LOGIN_URL='/login/'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
-
-MEDIA_URL = '/media/'
-MEDIA_ROOT= BASE_DIR / 'media'
+STATIC_URL = os.getenv("STATIC_URL", "/static/")
+MEDIA_URL = os.getenv("MEDIA_URL", "/media/")
+MEDIA_ROOT = BASE_DIR / os.getenv("MEDIA_ROOT", "media")
+STATIC_ROOT = BASE_DIR / os.getenv("STATIC_ROOT", "staticfiles")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
