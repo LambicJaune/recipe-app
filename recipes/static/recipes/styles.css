@@ -114,6 +114,20 @@ h3 {
     outline: none;
 }
 
+.form-group textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border-radius: 8px;
+    border: 1px solid #aaa;
+    font-size: 17px;
+    font-family: Roboto, Arial, sans-serif;
+    color: #002940;
+    background: #ffffff;
+    box-shadow: 0 3px 4px rgba(0,0,0,0.15);
+    box-sizing: border-box;
+}
+
+
 /* BUTTON ROW */
 .form-row.button-row {
     justify-content: center;
@@ -359,6 +373,32 @@ h3 {
 .button-return-overview:hover {
     background-color: #FFFDE8;
 }
+
+/* CREATE FORM PAGE */
+
+/* File input styling */
+.custom-file-upload {
+    display: inline-block;
+    padding: 10px 18px;
+    border-radius: 8px;
+    background-color: #CBE58B;
+    color: #002940;
+    font-weight: bold;
+    cursor: pointer;
+    text-align: center;
+    box-shadow: 0 3px 4px rgba(0,0,0,0.2);
+}
+
+.custom-file-upload input[type="file"] {
+    display: none; /* hide default input */
+}
+
+/* Make buttons same as .button-return-overview */
+button.button-return-overview, a.button-return-overview {
+    width: 100%;
+    text-align: center;
+}
+
 
 /* FOOTER */
 .footer {

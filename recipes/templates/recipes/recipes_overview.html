@@ -15,7 +15,10 @@
 
     <header class="header">
         <div class="header-left">Recipe App</div>
-        <a href="{% url 'logout' %}" class="logout-btn">Logout</a>
+        <div class="header-right">
+            <a href="{% url 'recipes:recipe_create' %}" class="header-btn">Add New Recipe</a> <a
+                href="{% url 'logout' %}" class="logout-btn header-btn">Logout</a>
+        </div>
     </header>
 
     <main class="main-content overview-page">
@@ -93,9 +96,7 @@
             <div class="recipe-item">
                 <a href="{{ object.get_absolute_url }}">
                     <div class="recipe-image-container">
-                        <img src="{% if object.pic %}{{ object.pic.url }}{% else %}{% static 'recipes/No-Pic.png' %}{% endif %}"
-                            alt="{{ object.name }}" class="recipe-image">
-
+                        <img src="{{ object.pic.url }}" alt="{{ object.name }}" class="recipe-image">
                     </div>
                     <div class="recipe-title-overlay">{{ object.name }}</div>
                 </a>

@@ -19,7 +19,8 @@
 
     <main class="main-content detail-page">
         <div class="recipe-detail-card">
-            <img src="{{ object.pic.url|default:'/media/no_picture.jpg' }}" alt="{{ object.name }}" class="recipe-image">
+            <img src="{{ object.pic.url }}" alt="{{ object.name }}" class="recipe-image">
+
             <h1>{{ object.name }}</h1>
 
             <p>{{ object.description }}</p>
@@ -31,8 +32,9 @@
                 <span><strong>Cooking Time:</strong> {{ object.cooking_time }} min</span>
                 <span><strong>Difficulty Level:</strong> {{ object.calculate_difficulty }}</span>
             </div>
-
-            <a href="{% url 'recipes:recipes_overview' %}" class="button-return-overview">Back to Recipes</a>
+            <a href="/overview">
+                <button class="button-return-overview">Back to Recipes</button>
+            </a>
         </div>
     </main>
 

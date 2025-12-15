@@ -1,4 +1,5 @@
 from django import forms
+from .models import Recipe
 
 # Overview search form
 class RecipeSearchForm(forms.Form):
@@ -52,6 +53,35 @@ class RecipeSearchForm(forms.Form):
 
         return cleaned_data
 
+class RecipeCreateForm(forms.ModelForm):
+    class Meta:
+        model = Recipe
+        fields = ['name', 'ingredients', 'cooking_time', 'pic']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-item', 'placeholder': 'Enter recipe name'}),
+            'ingredients': forms.Textarea(attrs={'class': 'form-item', 'placeholder': 'Enter ingredients, separated by commas', 'rows': 5}),
+            'cooking_time': forms.NumberInput(attrs={'class': 'form-item', 'placeholder': 'Minutes, can be 0'}),
+        }
+
+    def clean_ingredients(self):
+        ingredients = self.cleaned_data.get('ingredients', '')
+
+        # Replace newlines with commas
+        ingredients = ingredients.replace('\n', ',')
+
+        # Normalize spacing
+        ingredients = ', '.join(
+            part.strip() for part in ingredients.split(',') if part.strip()
+        )
+
+        return ingredients
+
+
+    def clean_cooking_time(self):
+        time = self.cleaned_data.get('cooking_time')
+        if time is None or time < 0:
+            raise forms.ValidationError("Cooking time cannot be negative.")
+        return time
 
 # Chart form, used only in recipe_charts view
 CHART_CHOICES = (

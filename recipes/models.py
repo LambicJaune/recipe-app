@@ -1,5 +1,5 @@
 from django.db import models
-from django.shortcuts import reverse
+from django.urls import reverse
 
 class Recipe(models.Model):
     recipe_id = models.AutoField(primary_key=True)
@@ -7,7 +7,7 @@ class Recipe(models.Model):
     ingredients = models.TextField()
     cooking_time = models.IntegerField(help_text="in minutes")
     difficulty = models.CharField(max_length=20, editable=False, blank=True)
-    pic = models.ImageField(upload_to='recipes', default='no_picture.jpg')
+    pic = models.ImageField(upload_to='recipes', default='recipes/no_picture.jpg', blank=True)
 
     @property
     def calculate_difficulty(self):
@@ -22,6 +22,19 @@ class Recipe(models.Model):
             return "Intermediate"
         else:
             return "Hard"
+
+    def save(self, *args, **kwargs):
+        # Capitalize first letter of each word
+        if self.name:
+            self.name = self.name.title()
+
+        # Capitalize each ingredient
+        if self.ingredients:
+            ingredients_list = [i.strip().title() for i in self.ingredients.split(',')]
+            self.ingredients = ', '.join(ingredients_list)
+
+        super().save(*args, **kwargs)
+        
 
     def __str__(self):
         return self.name

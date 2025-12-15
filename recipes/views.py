@@ -1,15 +1,16 @@
 from multiprocessing import context
 from django.shortcuts import render
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.views.generic import ListView, DetailView   
 from .models import Recipe
 # to protect class-based view
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .forms import RecipeSearchForm
+from .forms import RecipeSearchForm, RecipeCreateForm
 from django.db.models import Q
 import pandas as pd
 from django.views.generic import TemplateView
 from .utils import get_chart
+from django.views.generic.edit import CreateView
 
 # Create your views here.
 
@@ -176,6 +177,15 @@ class ChartView(LoginRequiredMixin, TemplateView):
             context['charts'] = {"bar": None, "pie": None, "line": None}
 
         return context
+    
+class RecipeCreateView(CreateView):
+    model = Recipe
+    form_class = RecipeCreateForm
+    template_name = 'recipes/recipe_create.html'
+
+    # Where to go after successful creation
+    def get_success_url(self):
+        return reverse_lazy('recipes:recipes_overview')
 
 class RecipeDetailView(LoginRequiredMixin, DetailView):
     model = Recipe

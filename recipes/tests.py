@@ -1,4 +1,4 @@
-from django.test import TestCase, Client
+from django.test import TestCase, Client, override_settings
 from django.urls import reverse, resolve
 from django.contrib.auth.models import User
 from .models import Recipe
@@ -6,10 +6,20 @@ from .views import recipes_home, RecipeListView, RecipeDetailView, ChartView
 from django.core.files.uploadedfile import SimpleUploadedFile
 import io
 from PIL import Image
+import tempfile
+import shutil
 
 # ---------------------------------------------
 # Helper functions
 # ---------------------------------------------
+def get_dummy_image():
+    """Returns a simple in-memory PNG image for testing."""
+    file = io.BytesIO()
+    image = Image.new("RGB", (100, 100), "white")
+    image.save(file, "PNG")
+    file.seek(0)
+    return SimpleUploadedFile("test.png", file.read(), content_type="image/png")
+
 def create_recipe(name="Test Recipe", cooking_time=20, ingredients="Eggs\nMilk", pic=None):
     if pic is None:
         pic = get_dummy_image()
@@ -20,18 +30,27 @@ def create_recipe(name="Test Recipe", cooking_time=20, ingredients="Eggs\nMilk",
         pic=pic
     )
 
-def get_dummy_image():
-    """Returns a simple in-memory PNG image for testing."""
-    file = io.BytesIO()
-    image = Image.new("RGB", (100, 100), "white")
-    image.save(file, "PNG")
-    file.seek(0)
-    return SimpleUploadedFile("test.png", file.read(), content_type="image/png")
+# ---------------------------------------------
+# Base Test Class with Temporary MEDIA_ROOT
+# ---------------------------------------------
+class MediaTestCase(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls._temp_media = tempfile.mkdtemp()
+        cls.override = override_settings(MEDIA_ROOT=cls._temp_media)
+        cls.override.enable()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.override.disable()
+        shutil.rmtree(cls._temp_media)
+        super().tearDownClass()
 
 # ---------------------------------------------
 # HOME VIEW TESTS
 # ---------------------------------------------
-class HomeViewTests(TestCase):
+class HomeViewTests(MediaTestCase):
 
     def setUp(self):
         self.client = Client()
@@ -46,7 +65,7 @@ class HomeViewTests(TestCase):
 # ---------------------------------------------
 # LOGIN REQUIRED TESTS
 # ---------------------------------------------
-class LoginRequiredTests(TestCase):
+class LoginRequiredTests(MediaTestCase):
 
     def setUp(self):
         self.client = Client()
@@ -75,7 +94,7 @@ class LoginRequiredTests(TestCase):
 # ---------------------------------------------
 # RECIPE OVERVIEW (LIST VIEW)
 # ---------------------------------------------
-class RecipeListViewTests(TestCase):
+class RecipeListViewTests(MediaTestCase):
 
     def setUp(self):
         self.client = Client()
@@ -110,7 +129,6 @@ class RecipeListViewTests(TestCase):
     def test_search_invalid_form(self):
         url = reverse("recipes:recipes_overview")
         response = self.client.get(url, {"max_cooking_time": "not-a-number"})
-        # Should not crash — form should be invalid and return all recipes
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Pancakes")
         self.assertContains(response, "Spaghetti")
@@ -119,7 +137,6 @@ class RecipeListViewTests(TestCase):
     def test_pagination(self):
         for i in range(20):
             create_recipe(f"R{i}", 5)
-
         url = reverse("recipes:recipes_overview")
         response = self.client.get(url)
         self.assertEqual(len(response.context["recipes"]), 16)
@@ -128,7 +145,7 @@ class RecipeListViewTests(TestCase):
 # ---------------------------------------------
 # DETAIL VIEW
 # ---------------------------------------------
-class RecipeDetailViewTests(TestCase):
+class RecipeDetailViewTests(MediaTestCase):
 
     def setUp(self):
         self.client = Client()
@@ -147,7 +164,7 @@ class RecipeDetailViewTests(TestCase):
 # ---------------------------------------------
 # CHART VIEW TESTS
 # ---------------------------------------------
-class ChartViewTests(TestCase):
+class ChartViewTests(MediaTestCase):
 
     def setUp(self):
         self.client = Client()
@@ -183,7 +200,7 @@ class ChartViewTests(TestCase):
 # ---------------------------------------------
 from .forms import RecipeSearchForm
 
-class RecipeSearchFormTests(TestCase):
+class RecipeSearchFormTests(MediaTestCase):
 
     def test_valid_form(self):
         form = RecipeSearchForm(data={
@@ -208,7 +225,7 @@ class RecipeSearchFormTests(TestCase):
 # ---------------------------------------------
 # URL CONFIGURATION TESTS
 # ---------------------------------------------
-class URLTests(TestCase):
+class URLTests(MediaTestCase):
 
     def test_urls_resolve(self):
         self.assertEqual(resolve(reverse("recipes:recipes_home")).func, recipes_home)
