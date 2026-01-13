@@ -2,7 +2,20 @@ from django.shortcuts import render, redirect
 #Django authentication libraries           
 from django.contrib.auth import authenticate, login, logout
 #Django Form for authentication
-from django.contrib.auth.forms import AuthenticationForm   
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+
+# define a function view called signup_view that takes a request from user
+def signup_view(request):
+    if request.method == "POST":
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect("recipes:recipes_overview")
+    else:
+        form = UserCreationForm()
+
+    return render(request, "auth/signup.html", {"form": form})
 
 #define a function view called login_view that takes a request from user
 def login_view(request):

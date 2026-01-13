@@ -16,8 +16,14 @@
     <header class="header">
         <div class="header-left">Recipe App</div>
         <div class="header-right">
-            <a href="{% url 'recipes:recipe_create' %}" class="header-btn">Add New Recipe</a> <a
-                href="{% url 'logout' %}" class="logout-btn header-btn">Logout</a>
+            <nav class="header-nav">
+                <a href="{% url 'recipes:recipes_overview' %}" class="header-link">All recipes</a>
+                <a href="{% url 'recipes:recipe_create' %}" class="header-link">Add recipe</a>
+                <a href="{% url 'recipes:recipe_search' %}" class="header-link">Search for a recipe</a>
+                <a href="{% url 'recipes:user_profile' %}" class="header-link">My profile</a>
+                <a href="{% url 'recipes:about_the_dev' %}" class="header-link">About the dev</a>
+            </nav>
+            <a href="{% url 'logout' %}" class="logout-btn">Logout</a>
         </div>
     </header>
 

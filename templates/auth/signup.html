@@ -5,7 +5,7 @@
     {% load static %}
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login</title>
+    <title>Sign Up</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'recipes/styles.css' %}">
@@ -19,39 +19,42 @@
     </header>
 
     <!-- MAIN CONTENT -->
-    <main class="main-content login-page">
+    <main class="main-content signup-page">
 
-        <h2>Welcome to Recipe App</h2>
+        <h2>Join Recipe App</h2>
         <p>
-            Discover, share, and explore delicious recipes.<br>
-            Search by ingredient, mood, or skill level — cooking made simple.
+            Create an account to save, explore, and share delicious recipes.<br>
+            It only takes a moment to get started.
         </p>
 
         <hr class="divider">
 
-        <h1>Login</h1>
-        <p>Enter your credentials to access your account.</p>
+        <h1>Sign Up</h1>
+        <p>Fill in the details below to create your account.</p>
 
-        {% if error_message %}
-        <p class="error-message">{{ error_message }}</p>
+        {% if form.errors %}
+        <div class="error-message">
+            {{ form.errors }}
+        </div>
         {% endif %}
 
         <div class="form-container">
-            <form action="" method="POST">
-                {% csrf_token %}
-                {{ form }}
+            <div class="signup-overlay">
+                <form method="POST">
+                    {% csrf_token %}
+                    {{ form }}
 
-                <div class="auth-buttons">
                     <button type="submit" class="button-return-overview">
-                        Login
+                        Create Account
                     </button>
-                    <a href="{% url 'signup' %}" class="button-return-overview">
-                        No account yet ? Sign Up !
-                    </a>
-                </div>
-
-            </form>
+                </form>
+            </div>
         </div>
+
+        <p style="margin-top: 20px;">
+            Already have an account?
+            <a href="{% url 'login' %}"><strong>Log in here</strong></a>
+        </p>
 
     </main>
 

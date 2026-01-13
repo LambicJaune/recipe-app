@@ -1,21 +1,27 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls import reverse, reverse_lazy
-from django.views.generic import ListView, DetailView, TemplateView
+from django.views.generic import ListView, DetailView, TemplateView, UpdateView
 from django.views.generic.edit import CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth import get_user_model
 from django.db.models import Q
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
 
 import pandas as pd
 
 from .models import Recipe
-from .forms import RecipeSearchForm, RecipeCreateForm
+from .forms import RecipeSearchForm, RecipeCreateForm, CustomUserChangeForm
 from .utils import get_chart
-
 
 # Home page
 def recipes_home(request):
     return render(request, 'recipes/recipes_home.html')
 
+
+# -------------------------
+# OVERVIEW OF ALL RECIPES
+# -------------------------
 
 class RecipeListView(LoginRequiredMixin, ListView):
     model = Recipe
@@ -118,6 +124,10 @@ class RecipeListView(LoginRequiredMixin, ListView):
         return [(ing, ing) for ing in sorted(ingredient_set)]
 
 
+# -------------------------
+# CHARTS VIEW
+# -------------------------
+
 class ChartView(LoginRequiredMixin, TemplateView):
     template_name = "recipes/recipe_charts.html"
 
@@ -159,6 +169,9 @@ class ChartView(LoginRequiredMixin, TemplateView):
 
         return context
 
+# -------------------------
+# CREATE RECIPE FORM VIEW
+# -------------------------
 
 class RecipeCreateView(CreateView):
     model = Recipe
@@ -167,9 +180,194 @@ class RecipeCreateView(CreateView):
 
     def get_success_url(self):
         return reverse_lazy('recipes:recipes_overview')
+    
+# -------------------------
+# RECIPE SEARCH VIEW
+# -------------------------
 
+class RecipeSearchView(LoginRequiredMixin, ListView):
+    model = Recipe
+    template_name = 'recipes/recipe_search.html'
+    context_object_name = 'recipes'
+    paginate_by = 16
+
+    def get_queryset(self):
+        qs = Recipe.objects.all().order_by('name')
+
+        # Ingredient choices
+        ingredient_choices = self.get_ingredient_choices()
+
+        # Bound form
+        self.form = RecipeSearchForm(self.request.GET or None, ingredient_choices=ingredient_choices)
+
+        if self.request.GET and self.form.is_valid():
+            name = self.form.cleaned_data.get('recipe_name')
+            ingredients = self.form.cleaned_data.get('ingredient')
+            difficulty = self.form.cleaned_data.get('difficulty_level')
+            max_time = self.form.cleaned_data.get('max_cooking_time')
+
+            if name:
+                qs = qs.filter(name__icontains=name)
+
+            if ingredients:
+                ingredient_q = Q()
+                for ing in ingredients:
+                    ingredient_q |= Q(ingredients__icontains=ing)
+                qs = qs.filter(ingredient_q)
+
+            if difficulty:
+                qs = qs.filter(pk__in=[r.pk for r in qs if r.calculate_difficulty.lower() == difficulty.lower()])
+
+            if max_time is not None:
+                qs = qs.filter(cooking_time__lte=max_time)
+
+        return qs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['search_form'] = self.form
+
+        # Build DataFrame for table
+        data = []
+        for obj in context['recipes']:
+            recipe_url = reverse("recipes:recipe_detail", args=[obj.pk])
+            data.append({
+                "Name": f'<a href="{recipe_url}">{obj.name}</a>',
+                "Difficulty": obj.calculate_difficulty,
+                "Cooking Time (min)": obj.cooking_time,
+                "Ingredients": obj.ingredients,
+                "Picture": f'<img src="{obj.pic.url}" width="80" />' if obj.pic else ""
+            })
+        df = pd.DataFrame(data)
+        context['df_html'] = df.to_html(classes='table table-striped', index=False, escape=False)
+
+        return context
+
+    def get_ingredient_choices(self):
+        all_ingredients = Recipe.objects.values_list('ingredients', flat=True)
+        ingredient_set = set()
+        for ingredient_block in all_ingredients:
+            if ingredient_block:
+                raw_ingredients = ingredient_block.replace("\n", ",").split(",")
+                for ing in raw_ingredients:
+                    clean = ing.strip()
+                    if clean:
+                        ingredient_set.add(clean)
+        return [(ing, ing) for ing in sorted(ingredient_set)]
+
+
+# -------------------------
+# SINGLE RECIPE VIEW
+# -------------------------
 
 class RecipeDetailView(LoginRequiredMixin, DetailView):
     model = Recipe
     template_name = 'recipes/recipe_detail.html'
     context_object_name = 'recipe'
+
+# -------------------------
+# USER PROFILE VIEW
+# -------------------------
+
+User = get_user_model()
+
+
+class UserProfileView(LoginRequiredMixin, TemplateView):
+    template_name = "recipes/user.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["profile_form"] = CustomUserChangeForm(instance=self.request.user)
+        context["password_form"] = PasswordChangeForm(user=self.request.user)
+        return context
+
+    def post(self, request, *args, **kwargs):
+
+        # PROFILE UPDATE FORM
+        if "update_profile" in request.POST:
+            profile_form = CustomUserChangeForm(
+                request.POST, instance=request.user
+            )
+            password_form = PasswordChangeForm(user=request.user)
+
+            if profile_form.is_valid():
+                profile_form.save()
+
+        # PASSWORD CHANGE FORM
+        elif "change_password" in request.POST:
+            profile_form = CustomUserChangeForm(instance=request.user)
+            password_form = PasswordChangeForm(
+                user=request.user,
+                data=request.POST
+            )
+
+            if password_form.is_valid():
+                user = password_form.save()
+                update_session_auth_hash(request, user)  # IMPORTANT
+                return redirect("recipes:user_profile")
+
+        return self.render_to_response({
+            "profile_form": profile_form,
+            "password_form": password_form,
+        })
+
+# -------------------------
+# ABOUT THE DEV VIEW
+# -------------------------
+
+class AboutView(LoginRequiredMixin, TemplateView):
+    template_name = "recipes/about_the_dev.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context["developer"] = {
+                "name": "GAEL GIRAUD",
+                "title": "Full-Stack Developer (Python / Django / JavaScript)",
+                "intro": (
+                    "I'm a full-stack developer with a strong backend focus on Python and Django. "
+                    "I build clean, maintainable applications and enjoy working across the stack, "
+                    "from backend APIs to modern frontend interfaces."
+                ),
+
+                "skills": {
+                    "Backend": [
+                        "Python",
+                        "Django (CBVs, ORM, Auth, Forms)",
+                        "RESTful API design",
+                        "Data processing with Pandas",
+                    ],
+                    "Frontend": [
+                        "React (JWT auth, protected routes, caching)",
+                        "Angular (TypeScript, RxJS, Material, accessibility)",
+                        "Responsive design & UI state management",
+                        "Data visualization (Recharts)",
+                    ],
+                    "APIs & Cloud": [
+                        "Node.js & Express",
+                        "MongoDB Atlas (Mongoose)",
+                        "Authentication (JWT, Passport.js)",
+                        "AWS Lambda (serverless)",
+                        "Deployment (Heroku)",
+                    ],
+                    "Mobile": [
+                        "React Native / Expo with Firebase (auth & real-time data)",
+                    ],
+                },
+
+                "soft_skills": [
+                    "Clear communication with non-technical stakeholders",
+                    "Experience working with developers and support teams",
+                    "Highly adaptable, self-taught career transition",
+                    "Strong focus on quality, maintainability, and documentation",
+                ],
+
+                "links": {
+                    "github": "https://github.com/lambicjaune",
+                    "portfolio": "https://lambicjaune.github.io/portfolio-website/",
+                },
+
+                "image": "recipes/images/developer.jpg",
+            }
+
+        return context

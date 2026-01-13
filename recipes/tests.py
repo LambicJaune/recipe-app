@@ -8,6 +8,8 @@ import io
 from PIL import Image
 import tempfile
 import shutil
+from .forms import RecipeCreateForm
+from django.contrib.auth import get_user_model
 
 # ---------------------------------------------
 # Helper functions
@@ -231,3 +233,219 @@ class URLTests(MediaTestCase):
         self.assertEqual(resolve(reverse("recipes:recipes_home")).func, recipes_home)
         self.assertEqual(resolve(reverse("recipes:recipes_overview")).func.view_class, RecipeListView)
         self.assertEqual(resolve(reverse("recipes:recipe_charts")).func.view_class, ChartView)
+
+User = get_user_model()
+
+
+# ---------------------------------------------
+# ABOUT VIEW TESTS
+# ---------------------------------------------
+class AboutViewTests(MediaTestCase):
+
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user("tester", password="pass123")
+        self.client.login(username="tester", password="pass123")
+
+    def test_about_page_loads(self):
+        response = self.client.get(reverse("recipes:about_the_dev"))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "recipes/about_the_dev.html")
+        self.assertIn("developer", response.context)
+
+
+# ---------------------------------------------
+# RECIPE CREATE VIEW TESTS
+# ---------------------------------------------
+class RecipeCreateViewTests(MediaTestCase):
+
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user("creator", password="pass123")
+        self.client.login(username="creator", password="pass123")
+
+    def test_create_view_get(self):
+        response = self.client.get(reverse("recipes:recipe_create"))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "recipes/recipe_create.html")
+        self.assertIsInstance(response.context["form"], RecipeCreateForm)
+
+    def test_create_recipe_valid_post(self):
+        response = self.client.post(
+            reverse("recipes:recipe_create"),
+            {
+                "name": "New Recipe",
+                "ingredients": "Eggs, Milk",
+                "cooking_time": 15,
+            },
+            follow=True,
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(Recipe.objects.filter(name="New Recipe").exists())
+
+    def test_create_recipe_invalid_post(self):
+        response = self.client.post(
+            reverse("recipes:recipe_create"),
+            {
+                "name": "",
+                "ingredients": "",
+                "cooking_time": -5,
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Recipe.objects.count(), 0)
+
+
+# ---------------------------------------------
+# RECIPE SEARCH VIEW (DEDICATED)
+# ---------------------------------------------
+class RecipeSearchViewTests(MediaTestCase):
+
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user("searcher", password="pass123")
+        self.client.login(username="searcher", password="pass123")
+
+        create_recipe("Apple Pie", 25, "Apple\nSugar")
+        create_recipe("Egg Salad", 5, "Eggs\nSalt")
+
+    def test_search_page_loads(self):
+        response = self.client.get(reverse("recipes:recipe_search"))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "recipes/recipe_search.html")
+
+    def test_search_by_name(self):
+        response = self.client.get(
+            reverse("recipes:recipe_search"),
+            {"recipe_name": "apple"},
+        )
+        self.assertContains(response, "Apple Pie")
+        self.assertNotContains(response, "Egg Salad")
+
+    def test_search_no_results(self):
+        response = self.client.get(
+            reverse("recipes:recipe_search"),
+            {"recipe_name": "doesnotexist"},
+        )
+        self.assertNotContains(response, "Apple Pie")
+        self.assertNotContains(response, "Egg Salad")
+
+
+# ---------------------------------------------
+# USER PROFILE VIEW TESTS
+# ---------------------------------------------
+class UserProfileViewTests(MediaTestCase):
+
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(
+            username="profileuser",
+            password="oldpassword",
+            email="old@test.com",
+        )
+        self.client.login(username="profileuser", password="oldpassword")
+
+    def test_profile_page_loads(self):
+        response = self.client.get(reverse("recipes:user_profile"))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "recipes/user.html")
+
+    def test_profile_update(self):
+        response = self.client.post(
+            reverse("recipes:user_profile"),
+            {
+                "update_profile": "1",
+                "username": "profileuser",
+                "email": "new@test.com",
+                "first_name": "New",
+                "last_name": "Name",
+            },
+            follow=True,
+        )
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.email, "new@test.com")
+
+    def test_password_change_success(self):
+        response = self.client.post(
+            reverse("recipes:user_profile"),
+            {
+                "change_password": "1",
+                "old_password": "oldpassword",
+                "new_password1": "NewStrongPass123",
+                "new_password2": "NewStrongPass123",
+            },
+            follow=True,
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(
+            self.client.login(
+                username="profileuser", password="NewStrongPass123"
+            )
+        )
+
+    def test_password_change_failure(self):
+        response = self.client.post(
+            reverse("recipes:user_profile"),
+            {
+                "change_password": "1",
+                "old_password": "wrongpassword",
+                "new_password1": "x",
+                "new_password2": "y",
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+
+
+# ---------------------------------------------
+# AUTH VIEWS (PROJECT LEVEL)
+# ---------------------------------------------
+class AuthViewTests(MediaTestCase):
+
+    def setUp(self):
+        self.client = Client()
+
+    def test_signup_page_loads(self):
+        response = self.client.get(reverse("signup"))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "auth/signup.html")
+
+    def test_signup_creates_user(self):
+        response = self.client.post(
+            reverse("signup"),
+            {
+                "username": "newuser",
+                "password1": "StrongPass123!",
+                "password2": "StrongPass123!",
+            },
+            follow=True,
+        )
+        self.assertTrue(User.objects.filter(username="newuser").exists())
+
+    def test_login_success(self):
+        User.objects.create_user("loginuser", password="pass123")
+        response = self.client.post(
+            reverse("login"),
+            {
+                "username": "loginuser",
+                "password": "pass123",
+            },
+            follow=True,
+        )
+        self.assertEqual(response.status_code, 200)
+
+    def test_login_failure(self):
+        response = self.client.post(
+            reverse("login"),
+            {
+                "username": "wrong",
+                "password": "wrong",
+            },
+        )
+        self.assertContains(response, "ooops")
+
+    def test_logout_redirects(self):
+        user = User.objects.create_user("logoutuser", password="pass123")
+        self.client.login(username="logoutuser", password="pass123")
+        response = self.client.get(reverse("logout"))
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/login", response.url)

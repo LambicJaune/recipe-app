@@ -1,5 +1,6 @@
 from django import forms
 from .models import Recipe
+from django.contrib.auth.models import User
 
 # Overview search form
 class RecipeSearchForm(forms.Form):
@@ -31,7 +32,7 @@ class RecipeSearchForm(forms.Form):
     )
     
     max_cooking_time = forms.IntegerField(
-        label='Max Cooking Time (in minutes)',
+        label='Max Cooking Time (mn)',
         required=False,
         min_value=0,
         widget=forms.NumberInput(attrs={'class': 'form-item', 'placeholder': 'e.g., 30'})
@@ -97,3 +98,13 @@ class ChartForm(forms.Form):
         required=True,
         widget=forms.Select(attrs={'class': 'form-item'})
     )
+
+class CustomUserChangeForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = [
+            "username",
+            "email",
+            "first_name",
+            "last_name",
+        ]

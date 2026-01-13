@@ -1,4 +1,7 @@
-/* GLOBAL RESET */
+/* =========================================================
+   GLOBAL RESET & BASE ELEMENTS
+   ========================================================= */
+
 body, html {
     margin: 0;
     padding: 0;
@@ -23,7 +26,11 @@ h3 {
     color: #CBE58B;
 }
 
-/* HEADER */
+
+/* =========================================================
+   HEADER (ALL PAGES)
+   ========================================================= */
+
 .header {
     display: flex;
     justify-content: space-between;
@@ -37,7 +44,47 @@ h3 {
     box-shadow: #555555aa 0px 2px 5px;
 }
 
-/* MAIN CONTENT */
+/* Header right-side buttons / links */
+.header-right {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.header-nav {
+    display: flex;
+    gap: 16px;
+}
+
+.header-link {
+    color: #CBE58B; /* same green as buttons */
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.header-link:hover {
+    color: #ffffff;
+}
+
+/* Logout button (header usage) */
+.logout-btn {
+    padding: 10px 12px;
+    background-color: #CBE58B;
+    color: #002940;
+    font-weight: bold;
+    font-size: 14px;
+    border-radius: 8px;
+    text-decoration: none;
+    box-shadow: 0 3px 4px rgba(0, 0, 0, 0.15);
+}
+.logout-btn:hover {
+    background-color: #ffffff;
+}
+
+/* =========================================================
+   MAIN CONTENT WRAPPER (ALL PAGES)
+   ========================================================= */
+
 .main-content {
     min-height: calc(100vh - 141px);
     display: flex;
@@ -47,6 +94,7 @@ h3 {
     text-align: center;
 }
 
+/* Home page vertical centering */
 .main-content.home-page {
     justify-content: center;
 }
@@ -62,7 +110,11 @@ h3 {
     max-width: 600px;
 }
 
-/* FORM CONTAINER */
+
+/* =========================================================
+   GENERIC FORM LAYOUT (USED BY MULTIPLE PAGES)
+   ========================================================= */
+
 .form-container {
     display: flex;
     justify-content: center;
@@ -70,7 +122,7 @@ h3 {
     width: 100%;
 }
 
-/* FORM ROWS */
+/* Form rows (generic layout system) */
 .form-row {
     display: flex;
     flex-wrap: wrap;
@@ -78,14 +130,111 @@ h3 {
     margin-bottom: 15px;
 }
 
-/* HALF-WIDTH FIELDS */
+/* Half-width fields (create/edit forms) */
 .form-group.half-width {
     flex: 1 1 45%;
     display: flex;
     flex-direction: column;
 }
 
-/* LABELS */
+/* =========================================================
+   SIGNUP PAGE – FORM OVERLAY
+   ========================================================= */
+
+.main-content.signup-page .signup-overlay {
+    background-color: rgba(0, 0, 0, 0.6); /* semi-transparent black */
+    padding: 30px 25px;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 420px;
+    box-sizing: border-box;
+    padding: 40px 30px;
+}
+
+/* Labels inside signup overlay */
+.main-content.signup-page .signup-overlay label {
+    font-weight: bold;
+    color: #FFFDE8; /* readable on dark overlay */
+    display: block;
+    margin-bottom: 8px;
+}
+
+/* Inputs inside signup form */
+.signup-page .signup-overlay input {
+    width: 100%;          /* full width */
+    max-width: 380px;     /* control overall input size */
+    padding: 12px 15px;   /* inner padding */
+    margin-top: 10px;
+    margin-bottom: 20px;  /* vertical spacing between inputs */
+    font-size: 1.1rem;
+    border-radius: 8px;
+    border: 1px solid #aaa;
+    box-sizing: border-box;
+}
+
+/* Textareas (if any) */
+.signup-page .signup-overlay textarea {
+    width: 100%;
+    max-width: 380px;
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    border: 1px solid #aaa;
+    font-size: 1.1rem;
+    box-sizing: border-box;
+}
+
+/* Submit button spacing */
+.signup-page .signup-overlay .button-return-overview {
+    margin-top: 15px;
+}
+
+/* =========================================================
+   LOGIN PAGE – PAGE-SPECIFIC OVERRIDES
+   ========================================================= */
+
+/* Container for login + signup buttons */
+.login-page .auth-buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Auth buttons sizing (login page only) */
+.login-page .auth-buttons .button-return-overview {
+    width: 100%;
+    max-width: 200px;
+}
+
+/* Login form width constraint */
+.login-page .form-container form {
+    max-width: 420px;
+    width: 100%;
+}
+
+/* Login page input sizing override */
+.login-page .form-container input {
+    padding: 8px 10px;
+    font-size: 1.1rem;
+    border-radius: 6px;
+}
+
+/* Vertical spacing between login form elements */
+.login-page .form-container form > * {
+    margin-bottom: 20px;
+}
+
+/* Login page label alignment */
+.login-page label {
+    display: block;
+    margin-bottom: 6px;
+}
+
+
+/* =========================================================
+   FORM LABELS (GLOBAL)
+   ========================================================= */
+
 .form-group label {
     font-weight: bold;
     margin-bottom: 6px;
@@ -94,12 +243,17 @@ h3 {
     text-shadow: 1px 1px 2px #002940;
 }
 
+/* File upload label exception */
 .form-group label.custom-file-upload {
     color: #002940;
     text-shadow: none;
 }
 
-/* INPUTS AND DROPDOWN BUTTON */
+
+/* =========================================================
+   FORM INPUTS / SELECTS / TEXTAREAS (GLOBAL)
+   ========================================================= */
+
 .form-group input,
 .form-group select,
 .dropdown-btn {
@@ -144,7 +298,10 @@ h3 {
 }
 
 
-/* BUTTON ROW */
+/* =========================================================
+   FORM BUTTON ROWS (CREATE / EDIT FORMS)
+   ========================================================= */
+
 .form-row.button-row {
     justify-content: center;
     gap: 20px;
@@ -175,7 +332,11 @@ h3 {
     background-color: #FFFDE8;
 }
 
-/* MULTI-CHECKBOX DROPDOWN */
+
+/* =========================================================
+   MULTI-CHECKBOX DROPDOWN (CREATE / FILTER FORMS)
+   ========================================================= */
+
 .dropdown-wrapper {
     position: relative;
     width: 100%;
@@ -192,7 +353,7 @@ h3 {
     border: 1px solid #aaa;
     border-radius: 6px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-    max-height: 220px;
+    max-height: 200px;
     overflow-y: auto;
     z-index: 9999;
 }
@@ -213,7 +374,18 @@ h3 {
     margin: 0;
 }
 
-/* TABLE */
+/* Placeholder text */
+.dropdown-btn span {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* prevents long text from expanding button */
+}
+
+/* =========================================================
+   TABLES (OVERVIEW / LIST PAGES)
+   ========================================================= */
+
 .table-container table {
     width: 100%;        
     border-collapse: collapse;
@@ -242,40 +414,11 @@ h3 {
     background-color: rgba(67, 67, 67, 0.8);
 }
 
-/* HEADER RIGHT SECTION */
-.header-right {
-    display: flex;
-    gap: 15px;
-    align-items: center;
-}
 
-.header-btn {
-    padding: 10px 12px;
-    background-color: #CBE58B;
-    color: #002940;
-    font-weight: bold;
-    font-size: 14px;
-    border-radius: 8px;
-    text-decoration: none;
-    box-shadow: 0 3px 4px rgba(0, 0, 0, 0.15);
-}
+/* =========================================================
+   RECIPE OVERVIEW GRID
+   ========================================================= */
 
-.header-btn:hover {
-    background-color: #b8d878;
-}
-
-/* LOGOUT BUTTON */
-.logout-btn {
-    padding: 10px 12px;
-    font-size: 14px;
-    background-color: #CBE58B;
-    color: #002940;
-    text-decoration: none;
-    border-radius: 5px;
-    font-weight: bold;
-}
-
-/* RECIPE GRID */
 .recipe-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -322,7 +465,11 @@ h3 {
     font-size: 1.1rem;
 }
 
-/* RECIPE DETAIL PAGE */
+
+/* =========================================================
+   RECIPE DETAIL PAGE
+   ========================================================= */
+
 .recipe-detail-card {
     background-color: rgba(255, 253, 232, 0.85);
     color: #002940;
@@ -359,7 +506,7 @@ h3 {
     margin-bottom: 20px;
 }
 
-/* Cooking time and difficulty aligned */
+/* Cooking time & difficulty */
 .recipe-header {
     display: flex;
     justify-content: space-between;
@@ -371,7 +518,11 @@ h3 {
     font-weight: normal;
 }
 
-/* BACK BUTTON */
+
+/* =========================================================
+   GENERIC ACTION BUTTON (USED EVERYWHERE)
+   ========================================================= */
+
 .button-return-overview {
     display: inline-block;
     margin-top: 30px;
@@ -391,9 +542,18 @@ h3 {
     background-color: #FFFDE8;
 }
 
-/* CREATE FORM PAGE */
+/* Button width normalization (anchors & buttons) */
+button.button-return-overview,
+a.button-return-overview {
+    width: 100%;
+    text-align: center;
+}
 
-/* File input styling */
+
+/* =========================================================
+   CREATE / EDIT FORM – FILE INPUT
+   ========================================================= */
+
 .custom-file-upload {
     position: relative;
     display: inline-flex;
@@ -420,14 +580,181 @@ h3 {
     background-color: #FFFDE8;
 }
 
-/* Make buttons same as .button-return-overview */
-button.button-return-overview, a.button-return-overview {
+/* =========================================================
+   SEARCH RECIPES PAGE
+   ========================================================= */
+
+/* Max Cooking Time input */
+.search-form input[type="number"] {
+    width: 100px;       /* initial size */
+    max-width: 100%;    /* responsive on small screens */
+    box-sizing: border-box;
+}
+
+/* =========================================================
+   USER PAGE – FORM OVERLAY
+   ========================================================= */
+.main-content.user-page .user-overlay {
+    background-color: rgba(0, 0, 0, 0.6); /* semi-transparent black */
+    padding: 40px 30px;
+    border-radius: 10px;
     width: 100%;
-    text-align: center;
+    max-width: 500px;
+    box-sizing: border-box;
+}
+
+/* Labels inside user overlay */
+.main-content.user-page .user-overlay label {
+    font-weight: bold;
+    color: #FFFDE8;
+    display: block;
+    margin-bottom: 8px;
+}
+
+/* Inputs inside user overlay */
+.main-content.user-page .user-overlay input {
+    width: 100%;
+    max-width: 460px;
+    padding: 12px 15px;
+    margin-top: 4px;
+    margin-bottom: 15px;
+    font-size: 1.15rem;
+    border-radius: 8px;
+    border: 1px solid #aaa;
+    box-sizing: border-box;
+}
+
+/* Help text hidden */
+.helptext {
+    display: none;
+}
+
+/* Submit button spacing */
+.main-content.user-page .user-overlay .button-return-overview {
+    margin-top: 12px;
+}
+
+/* =========================================================
+   SEARCH RECIPES PAGE FIXES
+   ========================================================= */
+
+/* Max Cooking Time input: make same width as other fields */
+.search-form input[type="number"] {
+    width: 100%;       /* match other form fields */
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+/* Multi-checkbox dropdown adjustments (search page only) */
+.search-form .dropdown-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+/* Show dropdown on hover (no JS needed) */
+.search-form .dropdown-wrapper:hover .dropdown-content {
+    display: block;
+}
+
+/* Dropdown button: clickable area */
+.search-form .dropdown-btn {
+    cursor: pointer;
+}
+
+/* Dropdown content: styling only for search page */
+.search-form .dropdown-content {
+    display: none;          /* hidden by default */
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: #ffffff;
+    color: #002940;
+    border: 1px solid #aaa;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 9999;
+}
+
+/* Dropdown items */
+.search-form .dropdown-content label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    font-weight: normal;
+    font-size: 16px;
+}
+
+.search-form .dropdown-content input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: #002940;
+    margin: 0;
+}
+
+/* Dropdown placeholder text */
+.search-form .dropdown-btn span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Make all fields wider only on search page */
+.search-page .form-group input,
+.search-page .form-group select,
+.search-page .form-group textarea,
+.search-page .dropdown-btn {
+    width: 100%;           /* ensures they take full container width */
+    max-width: 600px;      /* adjust as needed */
+    box-sizing: border-box; /* keeps text aligned nicely */
 }
 
 
-/* FOOTER */
+/* =========================================================
+   ABOUT THE DEV PAGE (ABOUT ME CARD)
+   ========================================================= */
+
+.about-me-card {
+    background-color: rgba(255, 253, 232, 0.85);
+    color: #002940;
+    border-radius: 12px;
+    padding: 30px;
+    max-width: 500px;
+    width: 90%;
+    margin: 40px auto;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    text-align: center;
+}
+
+.about-me-card ul {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 15px 0;
+    text-align: center;
+    font-size: 1.2rem;
+}
+
+.about-me-card h4 {
+    font-size: 1.2rem;
+}
+
+.developer-image {
+    width: calc(100% + 60px); /* 30px left + 30px right to escape the padding */
+    margin: -30px 0 20px -30px;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    object-fit: cover;
+}
+
+
+
+/* =========================================================
+   FOOTER (ALL PAGES)
+   ========================================================= */
+
 .footer {
     background-color: #002940;
     padding: 10px 0;
@@ -439,7 +766,11 @@ button.button-return-overview, a.button-return-overview {
     width: 100%;
 }
 
-/* RESPONSIVE MEDIA QUERIES */
+
+/* =========================================================
+   RESPONSIVE MEDIA QUERIES (FINAL OVERRIDES)
+   ========================================================= */
+
 @media (max-width: 1200px) {
     .recipe-grid {
         grid-template-columns: repeat(3, 1fr);
