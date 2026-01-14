@@ -17,7 +17,7 @@ class Recipe(models.Model):
         """
         Compute difficulty dynamically based on cooking time and number of ingredients.
         """
-        ingredients_list = [i.strip() for i in self.ingredients.splitlines() if i.strip()]
+        ingredients_list = [i.strip() for i in self.ingredients.split(',') if i.strip()]
 
         if self.cooking_time < 10 and len(ingredients_list) < 4:
             return "Easy"
