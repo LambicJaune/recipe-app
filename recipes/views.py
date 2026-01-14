@@ -16,6 +16,9 @@ from .utils import get_chart
 
 # Home page
 def recipes_home(request):
+    """
+    Render the home page of the recipes application.
+    """
     return render(request, 'recipes/recipes_home.html')
 
 
@@ -24,12 +27,21 @@ def recipes_home(request):
 # -------------------------
 
 class RecipeListView(LoginRequiredMixin, ListView):
+    """
+    Display a paginated list of recipes with search and filter capabilities.
+
+    Supports filtering by recipe name, ingredients, difficulty level, and maximum cooking time.
+    Renders both a table view (using Pandas DataFrame) and a card layout for each recipe.
+    """
     model = Recipe
     template_name = 'recipes/recipes_overview.html'
     context_object_name = 'recipes'
     paginate_by = 16
 
     def get_queryset(self):
+        """
+        Retrieve and filter the queryset of recipes based on search criteria provided via GET parameters.
+        """
         qs = Recipe.objects.all().order_by('name')
 
         # Build ingredient choices first
@@ -70,6 +82,10 @@ class RecipeListView(LoginRequiredMixin, ListView):
         return qs
 
     def get_context_data(self, **kwargs):
+        """
+        Add search form and formatted DataFrame to the context for rendering.
+        Also prepares ingredient lists for card layout.
+        """
         context = super().get_context_data(**kwargs)
         context['search_form'] = self.form
 
@@ -110,6 +126,9 @@ class RecipeListView(LoginRequiredMixin, ListView):
         return context
 
     def get_ingredient_choices(self):
+        """
+        Extract and return a sorted list of unique ingredients from all recipes for use in search forms.
+        """
         all_ingredients = Recipe.objects.values_list('ingredients', flat=True)
         ingredient_set = set()
 
@@ -129,9 +148,15 @@ class RecipeListView(LoginRequiredMixin, ListView):
 # -------------------------
 
 class ChartView(LoginRequiredMixin, TemplateView):
+    """
+    Display various charts summarizing recipe data using Matplotlib based on cooking time and difficulty.
+    """
     template_name = "recipes/recipe_charts.html"
 
     def get_context_data(self, **kwargs):
+        """
+        Build chart data using Pandas and pass rendered charts to the template context.
+        """
         context = super().get_context_data(**kwargs)
 
         recipes = Recipe.objects.all()
@@ -174,11 +199,17 @@ class ChartView(LoginRequiredMixin, TemplateView):
 # -------------------------
 
 class RecipeCreateView(CreateView):
+    """
+    Provide a form for users to create and add new recipes to the database.
+    """
     model = Recipe
     form_class = RecipeCreateForm
     template_name = 'recipes/recipe_create.html'
 
     def get_success_url(self):
+        """
+        Redirect to the recipes overview page upon successful recipe creation.
+        """
         return reverse_lazy('recipes:recipes_overview')
     
 # -------------------------
@@ -186,12 +217,21 @@ class RecipeCreateView(CreateView):
 # -------------------------
 
 class RecipeSearchView(LoginRequiredMixin, ListView):
+    """
+    Display a paginated list of recipes based on search criteria.
+
+    Supports filtering by recipe name, ingredients, difficulty level, and maximum cooking time.
+    Renders results in a table format using Pandas DataFrame.
+    """
     model = Recipe
     template_name = 'recipes/recipe_search.html'
     context_object_name = 'recipes'
     paginate_by = 16
 
     def get_queryset(self):
+        """
+        Retrieve and filter the queryset of recipes based on search criteria.
+        """
         qs = Recipe.objects.all().order_by('name')
 
         # Ingredient choices
@@ -224,6 +264,9 @@ class RecipeSearchView(LoginRequiredMixin, ListView):
         return qs
 
     def get_context_data(self, **kwargs):
+        """
+        Add search form and formatted DataFrame to the context for rendering.
+        """
         context = super().get_context_data(**kwargs)
         context['search_form'] = self.form
 
@@ -244,6 +287,9 @@ class RecipeSearchView(LoginRequiredMixin, ListView):
         return context
 
     def get_ingredient_choices(self):
+        """
+        Extract and return a sorted list of unique ingredients from all recipes for search filtering.
+        """
         all_ingredients = Recipe.objects.values_list('ingredients', flat=True)
         ingredient_set = set()
         for ingredient_block in all_ingredients:
@@ -261,6 +307,9 @@ class RecipeSearchView(LoginRequiredMixin, ListView):
 # -------------------------
 
 class RecipeDetailView(LoginRequiredMixin, DetailView):
+    """
+    Display detailed information about a single recipe.
+    """
     model = Recipe
     template_name = 'recipes/recipe_detail.html'
     context_object_name = 'recipe'
@@ -273,15 +322,24 @@ User = get_user_model()
 
 
 class UserProfileView(LoginRequiredMixin, TemplateView):
+    """
+    Allow users to view and update their profile information and change their password.
+    """
     template_name = "recipes/user.html"
 
     def get_context_data(self, **kwargs):
+        """
+        Add profile update and password change forms to the context.
+        """
         context = super().get_context_data(**kwargs)
         context["profile_form"] = CustomUserChangeForm(instance=self.request.user)
         context["password_form"] = PasswordChangeForm(user=self.request.user)
         return context
 
     def post(self, request, *args, **kwargs):
+        """
+        Handle profile updates and password changes based on submitted forms.
+        """
 
         # PROFILE UPDATE FORM
         if "update_profile" in request.POST:
@@ -316,9 +374,15 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
 # -------------------------
 
 class AboutView(LoginRequiredMixin, TemplateView):
+    """
+    Display information about the developer.
+    """
     template_name = "recipes/about_the_dev.html"
 
     def get_context_data(self, **kwargs):
+        """
+        Add developer information (metadata) to the context for rendering.
+        """
         context = super().get_context_data(**kwargs)
 
         context["developer"] = {

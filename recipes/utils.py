@@ -40,6 +40,7 @@ def style_axes(fig, ax):
 
 
 def get_chart(chart_type, data=None, **kwargs):
+    """Generate chart based on type and data, return as base64 PNG."""
 
     plt.switch_backend("AGG")
 

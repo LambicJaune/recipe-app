@@ -2,6 +2,9 @@ from django.db import models
 from django.urls import reverse
 
 class Recipe(models.Model):
+    """
+    Model representing a cooking recipe.
+    """
     recipe_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=120)
     ingredients = models.TextField()
@@ -11,7 +14,9 @@ class Recipe(models.Model):
 
     @property
     def calculate_difficulty(self):
-        """Compute difficulty dynamically."""
+        """
+        Compute difficulty dynamically based on cooking time and number of ingredients.
+        """
         ingredients_list = [i.strip() for i in self.ingredients.splitlines() if i.strip()]
 
         if self.cooking_time < 10 and len(ingredients_list) < 4:
@@ -24,6 +29,9 @@ class Recipe(models.Model):
             return "Hard"
 
     def save(self, *args, **kwargs):
+        """
+        Override save method to set difficulty and format fields.
+        """
         # Capitalize first letter of each word
         if self.name:
             self.name = self.name.title()
@@ -37,7 +45,13 @@ class Recipe(models.Model):
         
 
     def __str__(self):
+        """
+        String representation of the Recipe model.
+        """
         return self.name
 
     def get_absolute_url(self):
+        """
+        Get the URL to access a detail record for this recipe.
+        """
         return reverse("recipes:recipe_detail", kwargs={"pk": self.pk})

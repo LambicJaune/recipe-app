@@ -4,6 +4,9 @@ from django.contrib.auth.models import User
 
 # Overview search form
 class RecipeSearchForm(forms.Form):
+    """
+    Form for searching recipes based on various criteria.
+    """
     recipe_name = forms.CharField(
         label='Recipe Name',
         max_length=50,
@@ -39,11 +42,18 @@ class RecipeSearchForm(forms.Form):
     )
 
     def __init__(self, *args, **kwargs):
+        """
+        Initialize the form with dynamic ingredient choices.
+        """
         ingredient_choices = kwargs.pop('ingredient_choices', [])
         super().__init__(*args, **kwargs)
         self.fields['ingredient'].choices = ingredient_choices
 
     def clean(self):
+        """
+        Custom validation for the form.
+        Warn if 'hard' difficulty is selected with max cooking time less than 30 minutes.
+        """
         cleaned_data = super().clean()
         difficulty = cleaned_data.get("difficulty_level")
         max_time = cleaned_data.get("max_cooking_time")
@@ -55,6 +65,9 @@ class RecipeSearchForm(forms.Form):
         return cleaned_data
 
 class RecipeCreateForm(forms.ModelForm):
+    """
+    Form used to create and validate a new recipe.
+    """
     class Meta:
         model = Recipe
         fields = ['name', 'ingredients', 'cooking_time', 'pic']
@@ -65,6 +78,10 @@ class RecipeCreateForm(forms.ModelForm):
         }
 
     def clean_ingredients(self):
+        """
+        Clean and format the ingredients field.
+        Replaces newlines with commas and normalizes spacing.
+        """
         ingredients = self.cleaned_data.get('ingredients', '')
 
         # Replace newlines with commas
@@ -79,6 +96,9 @@ class RecipeCreateForm(forms.ModelForm):
 
 
     def clean_cooking_time(self):
+        """
+        Ensure cooking time is non-negative.
+        """
         time = self.cleaned_data.get('cooking_time')
         if time is None or time < 0:
             raise forms.ValidationError("Cooking time cannot be negative.")
@@ -92,6 +112,9 @@ CHART_CHOICES = (
 )
 
 class ChartForm(forms.Form):
+    """
+    Form for selecting chart type to display recipe statistics.
+    """
     chart_type = forms.ChoiceField(
         label='Chart Type',
         choices=CHART_CHOICES,
@@ -100,6 +123,9 @@ class ChartForm(forms.Form):
     )
 
 class CustomUserChangeForm(forms.ModelForm):
+    """
+    Form for updating user information.
+    """
     class Meta:
         model = User
         fields = [
