@@ -14,3 +14,8 @@ from django.core.wsgi import get_wsgi_application
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'recipe_project.settings')
 
 application = get_wsgi_application()
+
+from whitenoise import WhiteNoise
+from recipe_project.wsgi import application
+
+application = WhiteNoise(application, root=os.path.join(BASE_DIR, 'staticfiles'), prefix='static/')
