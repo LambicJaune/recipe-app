@@ -17,13 +17,14 @@ class Recipe(models.Model):
         """
         Compute difficulty dynamically based on cooking time and number of ingredients.
         """
-        ingredients_list = [i.strip() for i in self.ingredients.split(',') if i.strip()]
+        ingredients_list = [i.strip() for i in self.ingredients.replace("\n", ",").split(',') if i.strip()]
+        num_ingredients = len(ingredients_list)
 
-        if self.cooking_time < 10 and len(ingredients_list) < 4:
+        if self.cooking_time < 10 and num_ingredients < 4:
             return "Easy"
-        elif self.cooking_time < 10 and len(ingredients_list) >= 4:
+        elif self.cooking_time < 10 and num_ingredients >= 4:
             return "Medium"
-        elif self.cooking_time >= 10 and len(ingredients_list) < 4:
+        elif self.cooking_time >= 10 and num_ingredients <= 6:
             return "Intermediate"
         else:
             return "Hard"
@@ -38,7 +39,7 @@ class Recipe(models.Model):
 
         # Capitalize each ingredient
         if self.ingredients:
-            ingredients_list = [i.strip().title() for i in self.ingredients.split(',')]
+            ingredients_list = [i.strip().title() for i in self.ingredients.replace("\n", ",").split(',')]
             self.ingredients = ', '.join(ingredients_list)
 
         super().save(*args, **kwargs)
