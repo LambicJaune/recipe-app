@@ -102,7 +102,11 @@
             <div class="recipe-item">
                 <a href="{{ object.get_absolute_url }}">
                     <div class="recipe-image-container">
-                        <img src="{{ object.pic.url|default:'/media/recipes/no_picture.jpg' }}" alt="{{ object.name }}" class="recipe-image">
+                        {% if object.pic %}
+                        <img src="{{ object.pic.url }}" alt="{{ object.name }}" class="recipe-image">
+                        {% else %}
+                        <img src="{% static 'recipes/no_picture.jpg' %}" alt="{{ object.name }}" class="recipe-image">
+                        {% endif %}
                     </div>
                     <div class="recipe-title-overlay">{{ object.name }}</div>
                 </a>
