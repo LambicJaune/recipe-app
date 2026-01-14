@@ -40,7 +40,7 @@ class Recipe(models.Model):
                 return self.pic.url
         except ValueError:
             pass
-        return static('recipes/no_picture.jpg')
+        return static('recipes/images/no_picture.jpg')
 
     def save(self, *args, **kwargs):
         """
