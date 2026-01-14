@@ -1,5 +1,6 @@
 from django.db import models
 from django.urls import reverse
+from django.templatetags.static import static
 
 class Recipe(models.Model):
     """
@@ -28,6 +29,18 @@ class Recipe(models.Model):
             return "Intermediate"
         else:
             return "Hard"
+        
+    @property
+    def pic_or_default(self):
+        """
+        Return the URL of the recipe picture or a default image if not available.
+        """
+        try:
+            if self.pic and self.pic.storage.exists(self.pic.name):
+                return self.pic.url
+        except ValueError:
+            pass
+        return static('recipes/no_picture.jpg')
 
     def save(self, *args, **kwargs):
         """
@@ -56,3 +69,4 @@ class Recipe(models.Model):
         Get the URL to access a detail record for this recipe.
         """
         return reverse("recipes:recipe_detail", kwargs={"pk": self.pk})
+

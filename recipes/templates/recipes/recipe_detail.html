@@ -29,11 +29,7 @@
 
     <main class="main-content detail-page">
         <div class="recipe-detail-card">
-            {% if object.pic and object.pic.name %}
-            <img src="{{ object.pic.url }}" alt="{{ object.name }}" class="recipe-image">
-            {% else %}
-            <img src="{% static 'recipes/no_picture.jpg' %}" alt="{{ object.name }}" class="recipe-image">
-            {% endif %}
+            <img src="{{ object.pic_or_default }}" alt="{{ object.name }}" class="recipe-image">
 
             <h1>{{ object.name }}</h1>
 
