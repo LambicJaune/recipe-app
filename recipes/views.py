@@ -102,8 +102,7 @@ class RecipeListView(LoginRequiredMixin, ListView):
                 "Cooking Time (min)": obj.cooking_time,
                 "Ingredients": obj.ingredients,
                 "Picture": (
-                    f'<img src="{obj.pic.url}" width="80" />'
-                    if obj.pic else ""
+                    f'<img src="{obj.pic_or_default}" width="80" />'
                 )
             })
 
@@ -279,7 +278,7 @@ class RecipeSearchView(LoginRequiredMixin, ListView):
                 "Difficulty": obj.calculate_difficulty,
                 "Cooking Time (min)": obj.cooking_time,
                 "Ingredients": obj.ingredients,
-                "Picture": f'<img src="{obj.pic.url}" width="80" />' if obj.pic else ""
+                "Picture": f'<img src="{obj.pic_or_default}" width="80" />'
             })
         df = pd.DataFrame(data)
         context['df_html'] = df.to_html(classes='table table-striped', index=False, escape=False)

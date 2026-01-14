@@ -36,7 +36,7 @@ class Recipe(models.Model):
         Return the URL of the recipe picture or a default image if not available.
         """
         try:
-            if self.pic and self.pic.storage.exists(self.pic.name):
+            if self.pic and self.pic.name:
                 return self.pic.url
         except ValueError:
             pass
