@@ -11,7 +11,7 @@ class Recipe(models.Model):
     ingredients = models.TextField()
     cooking_time = models.IntegerField(help_text="in minutes")
     difficulty = models.CharField(max_length=20, editable=False, blank=True)
-    pic = models.ImageField(upload_to='recipes', default='recipes/no_picture.jpg', blank=True)
+    pic = models.ImageField(upload_to='recipes', default=None, blank=True, null=True)
 
     @property
     def calculate_difficulty(self):

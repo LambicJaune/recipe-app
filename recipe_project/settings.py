@@ -27,10 +27,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv("SECRET_KEY", "fallback-secret-key")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv("DEBUG", "True") == "True"
+DEBUG = os.getenv("DEBUG", "False") == "True"
 
 # Allowed hosts
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")  # converts CSV to list
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")  # converts CSV to list
 
 
 # Application definition
@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # recipe_project-related apps
     'recipes',
+    'cloudinary',
+    'cloudinary_storage',
 ]
 
 MIDDLEWARE = [
@@ -125,10 +127,14 @@ LOGIN_URL='/login/'
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = os.getenv("STATIC_URL", "/static/")
-MEDIA_URL = os.getenv("MEDIA_URL", "/media/")
-MEDIA_ROOT = BASE_DIR / os.getenv("MEDIA_ROOT", "media")
+#MEDIA_URL = os.getenv("MEDIA_URL", "/media/")
+#MEDIA_ROOT = BASE_DIR / os.getenv("MEDIA_ROOT", "media")
 STATIC_ROOT = BASE_DIR / os.getenv("STATIC_ROOT", "staticfiles")
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+STATICFILES_DIRS = [
+    BASE_DIR / "recipes" / "static",
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -139,3 +145,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 import dj_database_url
 db_from_env = dj_database_url.config(conn_max_age=500)
 DATABASES['default'].update(db_from_env)
+
+# Cloudinary configuration
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
+
+DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
