@@ -1,6 +1,7 @@
 from django.db import models
 from django.urls import reverse
-from django.templatetags.static import static
+from django.templatetags.static import 
+from cloudainary_storage.storage import MediaCloudinaryStorage
 
 class Recipe(models.Model):
     """
@@ -11,7 +12,7 @@ class Recipe(models.Model):
     ingredients = models.TextField()
     cooking_time = models.IntegerField(help_text="in minutes")
     difficulty = models.CharField(max_length=20, editable=False, blank=True)
-    pic = models.ImageField(upload_to='recipes', default=None, blank=True, null=True)
+    pic = models.ImageField(upload_to='recipes', storage=MediaCloudinaryStorage(), default=None, blank=True, null=True)
 
     @property
     def calculate_difficulty(self):
