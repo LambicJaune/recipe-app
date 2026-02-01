@@ -129,6 +129,8 @@ LOGIN_URL='/login/'
 STATIC_URL = os.getenv("STATIC_URL", "/static/")
 #MEDIA_URL = os.getenv("MEDIA_URL", "/media/")
 #MEDIA_ROOT = BASE_DIR / os.getenv("MEDIA_ROOT", "media")
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 STATIC_ROOT = BASE_DIR / os.getenv("STATIC_ROOT", "staticfiles")
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
