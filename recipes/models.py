@@ -1,6 +1,6 @@
 from django.db import models
 from django.urls import reverse
-from django.templatetags.static import 
+from django.templatetags.static import static
 from cloudainary_storage.storage import MediaCloudinaryStorage
 
 class Recipe(models.Model):
