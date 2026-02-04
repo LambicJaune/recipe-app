@@ -40,7 +40,18 @@ def style_axes(fig, ax):
 
 
 def get_chart(chart_type, data=None, **kwargs):
-    """Generate chart based on type and data, return as base64 PNG."""
+    """
+    Generate a chart as a base64 PNG string.
+
+    Args:
+        chart_type (str): 'bar', 'pie', or 'line'.
+        data (dict or DataFrame, optional): Required for 'bar' and 'line'.
+        **kwargs: Additional parameters for chart types:
+            - pie: 'labels' (list), 'sizes' (list)
+
+    Returns:
+        str: Base64-encoded PNG image of the chart.
+    """
 
     plt.switch_backend("AGG")
 

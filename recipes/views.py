@@ -337,7 +337,11 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
 
     def post(self, request, *args, **kwargs):
         """
-        Handle profile updates and password changes based on submitted forms.
+        Handle POST requests for the user profile page.
+
+        Depending on the submitted form:
+        - Updates user profile information if 'update_profile' is in POST data.
+        - Changes user password if 'change_password' is in POST data.
         """
 
         # PROFILE UPDATE FORM

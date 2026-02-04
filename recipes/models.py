@@ -45,7 +45,11 @@ class Recipe(models.Model):
 
     def save(self, *args, **kwargs):
         """
-        Override save method to set difficulty and format fields.
+        Override save method to:
+         - Set difficulty and format fields.
+         - Capitalize recipe name 
+         - Capitalize and normalize ingredients
+         - Call superclass save method.
         """
         # Capitalize first letter of each word
         if self.name:

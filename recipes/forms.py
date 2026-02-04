@@ -43,7 +43,7 @@ class RecipeSearchForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         """
-        Initialize the form with dynamic ingredient choices.
+        Initialize the form and dynamically set ingredient choices.
         """
         ingredient_choices = kwargs.pop('ingredient_choices', [])
         super().__init__(*args, **kwargs)

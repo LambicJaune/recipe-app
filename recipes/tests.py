@@ -11,10 +11,21 @@ import shutil
 from .forms import RecipeCreateForm
 from django.contrib.auth import get_user_model
 
+"""
+Tests for the recipes app.
+
+Includes:
+- View tests (Home, Overview, Detail, Charts, About, Recipe Create, Recipe Search, User Profile)
+- Model tests
+- Form tests (RecipeSearchForm, RecipeCreateForm)
+- Authentication tests (signup, login, logout)
+"""
+
 # ---------------------------------------------
 # Helper functions
 # ---------------------------------------------
 def get_dummy_image():
+
     """Returns a simple in-memory PNG image for testing."""
     file = io.BytesIO()
     image = Image.new("RGB", (100, 100), "white")
@@ -200,7 +211,7 @@ class ChartViewTests(MediaTestCase):
 # ---------------------------------------------
 # FORM TESTS
 # ---------------------------------------------
-from .forms import RecipeSearchForm
+from .forms import RecipeSearchForm, RecipeCreateForm
 
 class RecipeSearchFormTests(MediaTestCase):
 
@@ -223,6 +234,34 @@ class RecipeSearchFormTests(MediaTestCase):
         form = RecipeSearchForm(data={}, ingredient_choices=[])
         self.assertTrue(form.is_valid())
 
+class RecipeCreateFormTests(MediaTestCase):
+
+    def test_valid_form(self):
+        form = RecipeCreateForm(data={
+            "name": "My Recipe",
+            "ingredients": "Eggs, Milk",
+            "cooking_time": 10
+        })
+        self.assertTrue(form.is_valid())
+
+    def test_negative_cooking_time_is_invalid(self):
+        form = RecipeCreateForm(data={
+            "name": "Bad Recipe",
+            "ingredients": "Nothing",
+            "cooking_time": -1
+        })
+        self.assertFalse(form.is_valid())
+        self.assertIn("cooking_time", form.errors)
+
+    def test_ingredients_are_normalized(self):
+        form = RecipeCreateForm(data={
+            "name": "Normalize Test",
+            "ingredients": "Eggs\nMilk ,  Sugar",
+            "cooking_time": 5
+        })
+        self.assertTrue(form.is_valid())
+        recipe = form.save()
+        self.assertEqual(recipe.ingredients, "Eggs, Milk, Sugar")
 
 # ---------------------------------------------
 # URL CONFIGURATION TESTS
@@ -449,3 +488,79 @@ class AuthViewTests(MediaTestCase):
         response = self.client.get(reverse("logout"))
         self.assertEqual(response.status_code, 302)
         self.assertIn("/login", response.url)
+
+# ---------------------------------------------
+# MODEL TESTS
+# ---------------------------------------------
+
+class RecipeModelTests(MediaTestCase):
+
+    def test_str_representation(self):
+        recipe = Recipe.objects.create(
+            name="chocolate cake",
+            ingredients="Sugar, Cocoa",
+            cooking_time=30
+        )
+        self.assertEqual(str(recipe), "Chocolate Cake")
+
+    def test_name_and_ingredients_are_capitalized_on_save(self):
+        recipe = Recipe.objects.create(
+            name="apple pie",
+            ingredients="apple\nsugar, flour",
+            cooking_time=20
+        )
+        recipe.refresh_from_db()
+        self.assertEqual(recipe.name, "Apple Pie")
+        self.assertEqual(recipe.ingredients, "Apple, Sugar, Flour")
+
+    def test_calculate_difficulty_easy(self):
+        recipe = Recipe.objects.create(
+            name="Toast",
+            ingredients="Bread, Butter",
+            cooking_time=5
+        )
+        self.assertEqual(recipe.calculate_difficulty, "Easy")
+
+    def test_calculate_difficulty_medium(self):
+        recipe = Recipe.objects.create(
+            name="Salad",
+            ingredients="Lettuce, Tomato, Onion, Oil",
+            cooking_time=5
+        )
+        self.assertEqual(recipe.calculate_difficulty, "Medium")
+
+    def test_calculate_difficulty_intermediate(self):
+        recipe = Recipe.objects.create(
+            name="Pasta",
+            ingredients="Pasta, Salt, Oil",
+            cooking_time=15
+        )
+        self.assertEqual(recipe.calculate_difficulty, "Intermediate")
+
+    def test_calculate_difficulty_hard(self):
+        recipe = Recipe.objects.create(
+            name="Complex Dish",
+            ingredients="A, B, C, D, E, F, G",
+            cooking_time=45
+        )
+        self.assertEqual(recipe.calculate_difficulty, "Hard")
+
+    def test_pic_or_default_returns_default_when_missing(self):
+        recipe = Recipe.objects.create(
+            name="No Pic",
+            ingredients="Water",
+            cooking_time=1
+        )
+        self.assertIn("no_picture.jpg", recipe.pic_or_default)
+
+    def test_get_absolute_url(self):
+        recipe = Recipe.objects.create(
+            name="URL Test",
+            ingredients="Test",
+            cooking_time=10
+        )
+        self.assertEqual(
+            recipe.get_absolute_url(),
+            reverse("recipes:recipe_detail", kwargs={"pk": recipe.pk})
+        )
+
